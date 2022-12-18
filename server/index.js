@@ -42,7 +42,15 @@ app.use((req, res, next) => {
 	const err = new Error('Not Found');
 	err.status = 404;
 	res.status(err.status).json({ type: 'error', message: 'the url you are trying to reach is not hosted on our server' });
+
+	req.identifier = uuid();
+	const logString = `a request has been made with the following uuid [${req.identifier}] | ${req.ip} | ${req.url} | ${req.headers['user-agent']} ${JSON.stringify(req.body)}`;
+	const test = `test ${req.ip}  ${req.socket.remoteAddress}`;
+	logger.log(test , 'warn');
+	logger.log(logString, 'info');
 	next(err);
 });
+
+
 
 module.exports = app;
