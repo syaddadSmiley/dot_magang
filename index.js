@@ -47,8 +47,6 @@ app.use((req, res, next) => {
 
 	req.identifier = uuid();
 	const logString = `a request has been made with the following uuid [${req.identifier}] | ${req.ip} | ${req.url} | ${req.headers['user-agent']} ${JSON.stringify(req.body)}`;
-	const test = `test ${req.ip}  ${req.socket.remoteAddress}`;
-	logger.log(test , 'warn');
 	logger.log(logString, 'info');
 	next(err);
 });

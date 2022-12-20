@@ -50,6 +50,7 @@ class UsersController extends BaseController {
 			return requestHandler.sendError(req, res, err);
 		}
 	}
+
 }
 
 module.exports = UsersController;

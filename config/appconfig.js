@@ -6,7 +6,7 @@ require('dotenv').config();
 module.exports = {
 	app: {
 		port: process.env.DEV_APP_PORT || 3000,
-		appName: process.env.APP_NAME || 'iLrn',
+		appName: process.env.APP_NAME || 'ubisniz',
 		env: process.env.NODE_ENV || 'development',
 	},
 	db: {
@@ -31,7 +31,7 @@ module.exports = {
 	sendgrid: {
 		api_key: process.env.SEND_GRID_API_KEY,
 		api_user: process.env.USERNAME,
-		from_email: process.env.FROM_EMAIL || 'alaa.mezian.mail@gmail.com',
+		from_email: process.env.FROM_EMAIL || '.......@gmail.com',
 	},
 
 };

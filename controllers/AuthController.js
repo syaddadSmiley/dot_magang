@@ -100,19 +100,23 @@ class AuthController extends BaseController {
 		try {
 			const data = req.body;
 			const schema = {
+				uid: Joi.string().required(),
 				email: Joi.string().email().required(),
 				name: Joi.string().required(),
+				verified: Joi.bool().required(),
 			};
 			const randomString = stringUtil.generateString();
-
-			const { error } = Joi.validate({ email: data.email, name: data.name }, schema);
+			logger.log("sampai0", 'warn')
+			const { error } = Joi.validate({ uid: data.uid, email: data.email, name: data.name, verified: data.verified }, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', error ? error.details[0].message : '');
 			const options = { where: { email: data.email } };
-			const user = await super.getByCustomOptions(req, 'Users', options);
-
+			const user = await super.getByCustomOptions(req, 'users', options);
+			
 			if (user) {
 				requestHandler.throwError(400, 'bad request', 'invalid email account,email already existed')();
 			}
+
+			logger.log("sampai1", 'warn')
 
 			async.parallel([
 				function one(callback) {
@@ -132,6 +136,8 @@ class AuthController extends BaseController {
 					logger.log(`an email has been sent at: ${new Date()} to : ${data.email} with the following results ${results}`, 'info');
 				}
 			});
+
+			logger.log("sampai2", 'warn')
 
 			const hashedPass = bcrypt.hashSync(randomString, config.auth.saltRounds);
 			data.password = hashedPass;

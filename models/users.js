@@ -1,36 +1,30 @@
 
 
 module.exports = (sequelize, DataTypes) => {
-	const Users = sequelize.define('Users', {
-		id: {
-			type: DataTypes.INTEGER(11),
-			allowNull: false,
-			primaryKey: true,
-			autoIncrement: true,
-		},
-		name: {
+	const Users = sequelize.define('users', {
+		uid: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			primaryKey: true,
 		},
 		email: {
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
-		user_image: {
+		name: {
 			type: DataTypes.STRING,
-			allowNull: true,
+			allowNull: false,
+		},
+		verified: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
 		},
 		mobile_number: {
 			type: DataTypes.STRING,
 		},
-		gender: {
-			type: DataTypes.ENUM('male', 'female'),
-		},
-		password: {
+		user_img: {
 			type: DataTypes.STRING,
-		},
-		last_login_date: {
-			type: DataTypes.DATE,
+			allowNull: true,
 		},
 		createdAt:
 		{
@@ -38,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
 		},
 		updatedAt: {
 			type: DataTypes.DATE, field: 'updated_at',
+		},
+		deleted_status: {
+			type: DataTypes.STRING,
 		},
 
 	}, {});
