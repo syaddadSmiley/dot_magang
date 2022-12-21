@@ -22,12 +22,10 @@ class AuthController extends BaseController {
 		try {
 			const schema = {
 				email: Joi.string().email().required(),
-				fcmToken: Joi.string(),
 				platform: Joi.string().valid('ios', 'android', 'web').required(),
 			};
 			const { error } = Joi.validate({
 				email: req.body.email,
-				fcmToken: req.body.fcmToken,
 				platform: req.headers.platform,
 			}, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', error ? error.details[0].message : '');
@@ -39,7 +37,7 @@ class AuthController extends BaseController {
 				requestHandler.throwError(400, 'bad request', 'invalid email address')();
 			}
 
-			if (req.headers.fcmtoken && req.headers.platform) {
+			if (req.headers.platform) {
 				const find = {
 					where: {
 						user_id: user.id,
