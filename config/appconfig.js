@@ -19,7 +19,7 @@ module.exports = {
 		logging: true,
 	},
 	winiston: {
-		logpath: '/iLrnLogs/logs/',
+		logpath: '/ubisnizLogs/logs/',
 	},
 	auth: {
 		jwt_secret: process.env.JWT_SECRET,
