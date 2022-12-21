@@ -15,9 +15,9 @@ class UsersController extends BaseController {
 		try {
 			const reqParam = req.params.id;
 			const schema = {
-				id: Joi.number().integer().min(1),
+				uid: Joi.string().min(1),
 			};
-			const { error } = Joi.validate({ id: reqParam }, schema);
+			const { error } = Joi.validate({ uid: reqParam }, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', 'invalid User Id');
 
 			const result = await super.getById(req, 'users');

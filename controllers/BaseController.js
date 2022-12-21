@@ -22,6 +22,7 @@ class BaseController {
     */
 	static async getById(req, modelName) {
 		const reqParam = req.params.id;
+		logger.log(reqParam, 'warn');
 		let result;
 		try {
 			result = await req.app.get('db')[modelName].findByPk(reqParam).then(
@@ -36,7 +37,7 @@ class BaseController {
 
 	static async getByCustomOptions(req, modelName, options) {
 		let result;
-		console.log(req, modelName, options)
+		// console.log(req, modelName, options)
 		try {
 			result = await req.app.get('db')[modelName].findOne(options);
 		} catch (err) {

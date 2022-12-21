@@ -14,8 +14,7 @@ const auth = require('../utils/auth');
 const config = require('../config/appconfig');
 const { join } = require('lodash');
 
-var check = require('validator').check,
-    sanitize = require('validator').sanitize
+var sanitize = require('validator').sanitize
 
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
@@ -24,7 +23,8 @@ const tokenList = {};
 class AuthController extends BaseController {
 	static async login(req, res) {
 		try {
-			var cleanedUserAgent = sanitize(window.navigator.userAgent).trim();
+			var cleanedUserAgent = req.headers['user-agent'].replace(/[^a-zA-Z0-9_-]/g,'');
+			logger.log(cleanedUserAgent, 'warn');
 			const schema = {
 				email: Joi.string().email().required(),
 				user_agent: Joi.string().required(),
@@ -33,56 +33,57 @@ class AuthController extends BaseController {
 				email: req.body.email,
 				user_agent: cleanedUserAgent,
 			}, schema);
+			logger.log("DIsini kaj", 'warn');
 			requestHandler.validateJoi(error, 400, 'bad Request', error ? error.details[0].message : '');
 			const options = {
 				where: { email: req.body.email },
 			};
+			var x = String(cleanedUserAgent).includes("Dart");
+			logger.log(x, 'warn');
 			const user = await super.getByCustomOptions(req, 'users', options);
 			if (!user) {
 				requestHandler.throwError(400, 'bad request', 'invalid email address')();
-			}
+			} 
+			var logString = "User Agent "+cleanedUserAgent
+			logger.log(logString, 'warn');
+			if (String(cleanedUserAgent).includes("Mozilla") ||  String(cleanedUserAgent).includes("Chrome") || String(cleanedUserAgent).includes("Dart")) {
+				
+				const find = {
+					where: {
+						user_id: user.id,
+					},
+				};
 
-			console.log("User Agent", cleanedUserAgent);
+				// const fcmToken = await super.getByCustomOptions(req, 'UserTokens', find);
+				const data = {
+					userId: user.id,
+					platform: req.headers.platform,
+				};
 
-			if (req.headers.platform) {
-				if (String(cleanedUserAgent).includes("Mozilla") ||  String(cleanedUserAgent).includes("Chrome")) {
-					const find = {
-						where: {
-							user_id: user.id,
-							fcmToken: req.headers.fcmtoken,
-						},
-					};
-
-					const fcmToken = await super.getByCustomOptions(req, 'UserTokens', find);
-					const data = {
-						userId: user.id,
-						fcmToken: req.headers.fcmtoken,
-						platform: req.headers.platform,
-					};
-
-					if (fcmToken) {
-						req.params.id = fcmToken.id;
-						await super.updateById(req, 'UserTokens', data);
-					} else {
-						await super.create(req, 'UserTokens', data);
-					}
-				}
-			} else {
+				// if (fcmToken) {
+				// 	req.params.id = fcmToken.id;
+				// 	await super.updateById(req, 'UserTokens', data);
+				// } else {
+				// 	await super.create(req, 'UserTokens', data);
+				// }
+			}else {
 				requestHandler.throwError(400, 'bad request', 'please provide all required headers')();
 			}
-
-			await bcrypt
-				.compare(req.body.password, user.password)
-				.then(
-					requestHandler.throwIf(r => !r, 400, 'incorrect', 'failed to login bad credentials'),
-					requestHandler.throwError(500, 'bcrypt error'),
-				);
+			
+			// await bcrypt
+			// 	.compare(req.body.password, user.password)
+			// 	.then(
+			// 		requestHandler.throwIf(r => !r, 400, 'incorrect', 'failed to login bad credentials'),
+			// 		requestHandler.throwError(500, 'bcrypt error'),
+			// 	);
 			const data = {
 				last_login_date: new Date(),
 			};
 			req.params.id = user.id;
-			await super.updateById(req, 'Users', data);
-			const payload = _.omit(user.dataValues, ['createdAt', 'updatedAt', 'last_login_date', 'password', 'gender', 'mobile_number', 'user_image']);
+			await super.updateById(req, 'users', data);
+			
+			const payload = _.omit(user.dataValues, ['createdAt', 'updatedAt', 'uid', 'mobile_number', 'user_img']);
+			logger.log(config.auth.jwt_secret, 'warn')
 			const token = jwt.sign({ payload }, config.auth.jwt_secret, { expiresIn: config.auth.jwt_expiresin, algorithm: 'HS512' });
 			const refreshToken = jwt.sign({
 				payload,
