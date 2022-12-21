@@ -69,6 +69,8 @@ class AuthController extends BaseController {
 			}else {
 				requestHandler.throwError(400, 'bad request', 'please provide all required headers')();
 			}
+
+			console.log("REQUEST", req.headers.authorization);
 			
 			// await bcrypt
 			// 	.compare(req.body.password, user.password)

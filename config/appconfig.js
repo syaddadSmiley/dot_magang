@@ -22,7 +22,8 @@ module.exports = {
 		logpath: '/ubisnizLogs/logs/',
 	},
 	auth: {
-		jwt_secret: process.env.JWT_SECRET || 'QFViaXNuaXpEZXYyMDIyX0pXVA==',
+		aes_secret: process.env.AES_SECRET || 'UUZWaWFYTnVhWHBFWlhZeU1ESXlYMEZG',
+		jwt_secret: process.env.JWT_SECRET || 'UUZWaWFYTnVhWHBFWlhZeU1ESXlYMHBYVkFVRGV2MjAyMj09',
 		jwt_expiresin: process.env.JWT_EXPIRES_IN || '1d',
 		saltRounds: process.env.SALT_ROUND || 10,
 		refresh_token_secret: process.env.REFRESH_TOKEN_SECRET || 'QFViaXNuaXpEZXYyMDIy',

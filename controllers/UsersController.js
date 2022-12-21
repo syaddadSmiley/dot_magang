@@ -1,10 +1,15 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const config = require('../config/appconfig')
+
+const CryptoX = require('../utils/CryptoX')
 const BaseController = require('../controllers/BaseController');
 const RequestHandler = require('../utils/RequestHandler');
 const Logger = require('../utils/logger');
 const auth = require('../utils/auth');
+const { json } = require('body-parser');
+
 
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
@@ -20,7 +25,14 @@ class UsersController extends BaseController {
 			const { error } = Joi.validate({ uid: reqParam }, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', 'invalid User Id');
 
-			const result = await super.getById(req, 'users');
+			const resultRaw = await super.getById(req, 'users');
+
+			var result = await CryptoX.encryptX(JSON.stringify(resultRaw.dataValues));
+			// var result = (resultEncoded).encryptedData;
+
+			// var decryptedString = await Cryptograph.decrypt(JSON.stringify(result));
+			// console.log("58", decryptedString);
+
 			return requestHandler.sendSuccess(res, 'User Data Extracted')({ result });
 		} catch (error) {
 			return requestHandler.sendError(req, res, error);
