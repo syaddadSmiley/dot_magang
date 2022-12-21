@@ -1,4 +1,4 @@
-var mysql = require('mysql');
+var mysql = require('mysql2');
 var migration = require('mysql-migrations');
 
 var connection = mysql.createPool({
