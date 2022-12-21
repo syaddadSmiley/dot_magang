@@ -22,13 +22,11 @@ class AuthController extends BaseController {
 		try {
 			const schema = {
 				email: Joi.string().email().required(),
-				password: Joi.string().required(),
 				fcmToken: Joi.string(),
 				platform: Joi.string().valid('ios', 'android', 'web').required(),
 			};
 			const { error } = Joi.validate({
 				email: req.body.email,
-				password: req.body.password,
 				fcmToken: req.body.fcmToken,
 				platform: req.headers.platform,
 			}, schema);
@@ -36,7 +34,7 @@ class AuthController extends BaseController {
 			const options = {
 				where: { email: req.body.email },
 			};
-			const user = await super.getByCustomOptions(req, 'Users', options);
+			const user = await super.getByCustomOptions(req, 'users', options);
 			if (!user) {
 				requestHandler.throwError(400, 'bad request', 'invalid email address')();
 			}
@@ -118,30 +116,30 @@ class AuthController extends BaseController {
 
 			logger.log("sampai1", 'warn')
 
-			async.parallel([
-				function one(callback) {
-					email.sendEmail(
-						callback,
-						config.sendgrid.from_email,
-						[data.email],
-						' iLearn Microlearning ',
-						`please consider the following as your password${randomString}`,
-						`<p style="font-size: 32px;">Hello ${data.name}</p>  please consider the following as your password: ${randomString}`,
-					);
-				},
-			], (err, results) => {
-				if (err) {
-					requestHandler.throwError(500, 'internal Server Error', 'failed to send password email')();
-				} else {
-					logger.log(`an email has been sent at: ${new Date()} to : ${data.email} with the following results ${results}`, 'info');
-				}
-			});
+			// async.parallel([
+			// 	function one(callback) {
+			// 		email.sendEmail(
+			// 			callback,
+			// 			config.sendgrid.from_email,
+			// 			[data.email],
+			// 			' iLearn Microlearning ',
+			// 			`please consider the following as your password${randomString}`,
+			// 			`<p style="font-size: 32px;">Hello ${data.name}</p>  please consider the following as your password: ${randomString}`,
+			// 		);
+			// 	},
+			// ], (err, results) => {
+			// 	if (err) {
+			// 		requestHandler.throwError(500, 'internal Server Error', 'failed to send password email')();
+			// 	} else {
+			// 		logger.log(`an email has been sent at: ${new Date()} to : ${data.email} with the following results ${results}`, 'info');
+			// 	}
+			// });
 
 			logger.log("sampai2", 'warn')
 
 			const hashedPass = bcrypt.hashSync(randomString, config.auth.saltRounds);
 			data.password = hashedPass;
-			const createdUser = await super.create(req, 'Users');
+			const createdUser = await super.create(req, 'users');
 			if (!(_.isNull(createdUser))) {
 				requestHandler.sendSuccess(res, 'email with your password sent successfully', 201)();
 			} else {

@@ -20,7 +20,7 @@ class UsersController extends BaseController {
 			const { error } = Joi.validate({ id: reqParam }, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', 'invalid User Id');
 
-			const result = await super.getById(req, 'Users');
+			const result = await super.getById(req, 'users');
 			return requestHandler.sendSuccess(res, 'User Data Extracted')({ result });
 		} catch (error) {
 			return requestHandler.sendError(req, res, error);
