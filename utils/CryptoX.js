@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const algorithm = 'aes-256-cbc';
 const key = config.auth.aes_secret;
-const iv = crypto.randomBytes(16);
+const iv = config.auth.aes_iv;
 
 class CryptoX {
 	static async encryptX(text) {
@@ -13,7 +13,7 @@ class CryptoX {
 		return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
 	}
 
-	static async decrypt(text) {
+	static async decryptX(text) {
 		var textParse = JSON.parse(text);
 		let iv = Buffer.from(textParse.iv, 'hex');
 		let encryptedText = Buffer.from(textParse.encryptedData, 'hex');

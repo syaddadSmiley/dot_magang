@@ -1,9 +1,9 @@
 
 query = `CREATE TABLE IF NOT EXISTS users (
     uid VARCHAR(50) NOT NULL PRIMARY KEY,
-    email VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL,
-    verified BOOLEAN NOT NULL DEFAULT false,
+    verified BOOLEAN NOT NULL DEFAULT 0,
     mobile_number VARCHAR(20) NOT NULL,
     user_img LONGBLOB,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

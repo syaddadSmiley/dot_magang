@@ -13,6 +13,7 @@ const email = require('../utils/email');
 const auth = require('../utils/auth');
 const config = require('../config/appconfig');
 const { join } = require('lodash');
+const { decrypt, decryptX } = require('../utils/CryptoX');
 
 var sanitize = require('validator').sanitize
 
@@ -23,29 +24,34 @@ const tokenList = {};
 class AuthController extends BaseController {
 	static async login(req, res) {
 		try {
-			var cleanedUserAgent = req.headers['user-agent'].replace(/[^a-zA-Z0-9_-]/g,'');
-			logger.log(cleanedUserAgent, 'warn');
+			const cleanedUserAgent = req.headers['user-agent'].replace(/[^a-zA-Z0-9_-]/g,'');
+			const cleanedUid = req.body.uid.replace(/[^a-zA-Z0-9_-]/g, '');
+			const cleanedEmail = req.body.email.replace(/[^a-zA-Z0-9_@.-]/g, '');
+			console.log(cleanedEmail, cleanedUid);
+			// logger.log(cleanedUserAgent, 'warn');
 			const schema = {
 				email: Joi.string().email().required(),
+				uid: Joi.string().required(),
 				user_agent: Joi.string().required(),
 			};
 			const { error } = Joi.validate({
-				email: req.body.email,
+				email: cleanedEmail,
+				uid: cleanedUid,
 				user_agent: cleanedUserAgent,
 			}, schema);
-			logger.log("DIsini kaj", 'warn');
+			// logger.log("DIsini kaj", 'warn');
 			requestHandler.validateJoi(error, 400, 'bad Request', error ? error.details[0].message : '');
 			const options = {
-				where: { email: req.body.email },
+				where: { uid: cleanedUid },
 			};
-			var x = String(cleanedUserAgent).includes("Dart");
-			logger.log(x, 'warn');
+			// var x = String(cleanedUserAgent).includes("Dart");
+			// logger.log(x, 'warn');
 			const user = await super.getByCustomOptions(req, 'users', options);
 			if (!user) {
-				requestHandler.throwError(400, 'bad request', 'invalid email address')();
+				requestHandler.throwError(400, 'bad request', 'invalid')();
 			} 
-			var logString = "User Agent "+cleanedUserAgent
-			logger.log(logString, 'warn');
+			// var logString = "User Agent "+cleanedUserAgent
+			// logger.log(logString, 'warn');
 			if (String(cleanedUserAgent).includes("Mozilla") ||  String(cleanedUserAgent).includes("Chrome") || String(cleanedUserAgent).includes("Dart")) {
 				
 				const find = {
@@ -71,20 +77,20 @@ class AuthController extends BaseController {
 			}
 
 			console.log("REQUEST", req.headers.authorization);
-			
-			// await bcrypt
-			// 	.compare(req.body.password, user.password)
-			// 	.then(
-			// 		requestHandler.throwIf(r => !r, 400, 'incorrect', 'failed to login bad credentials'),
-			// 		requestHandler.throwError(500, 'bcrypt error'),
-			// 	);
+			console.log(user.email, cleanedEmail);
+			await bcrypt
+				.compare(cleanedEmail, user.email)
+				.then(
+					requestHandler.throwIf(r => !r, 400, 'incorrect', 'failed to login bad credentials'),
+					requestHandler.throwError(500, 'bcrypt error'),
+				);
 			const data = {
 				last_login_date: new Date(),
 			};
 			req.params.id = user.id;
 			await super.updateById(req, 'users', data);
 			
-			const payload = _.omit(user.dataValues, ['createdAt', 'updatedAt', 'uid', 'mobile_number', 'user_img']);
+			const payload = _.omit(user.dataValues, ['createdAt', 'updatedAt', 'uid', 'mobile_number', 'verified']);
 			logger.log(config.auth.jwt_secret, 'warn')
 			const token = jwt.sign({ payload }, config.auth.jwt_secret, { expiresIn: config.auth.jwt_expiresin, algorithm: 'HS512' });
 			const refreshToken = jwt.sign({
@@ -111,17 +117,15 @@ class AuthController extends BaseController {
 				uid: Joi.string().required(),
 				email: Joi.string().email().required(),
 				name: Joi.string().required(),
-				verified: Joi.bool().required(),
 			};
-			const randomString = stringUtil.generateString();
 			logger.log("sampai0", 'warn')
-			const { error } = Joi.validate({ uid: data.uid, email: data.email, name: data.name, verified: data.verified }, schema);
+			const { error } = Joi.validate({ uid: data.uid, email: data.email, name: data.name }, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', error ? error.details[0].message : '');
-			const options = { where: { email: data.email } };
+			const options = { where: { uid: data.uid } };
 			const user = await super.getByCustomOptions(req, 'users', options);
 			
 			if (user) {
-				requestHandler.throwError(400, 'bad request', 'invalid email account,email already existed')();
+				requestHandler.throwError(400, 'bad request', 'invalid, account already existed')();
 			}
 
 			logger.log("sampai1", 'warn')
@@ -147,11 +151,31 @@ class AuthController extends BaseController {
 
 			logger.log("sampai2", 'warn')
 
-			const hashedPass = bcrypt.hashSync(randomString, config.auth.saltRounds);
-			data.password = hashedPass;
+			const hashedEmail = bcrypt.hashSync(data.email, config.auth.saltRounds);
+			data.email = hashedEmail;
+			console.log(data.email);
 			const createdUser = await super.create(req, 'users');
 			if (!(_.isNull(createdUser))) {
-				requestHandler.sendSuccess(res, 'email with your password sent successfully', 201)();
+				const options = {
+					where: { uid: data.uid },
+				};
+				const user = await super.getByCustomOptions(req, 'users', options);
+				console.log(user.dataValues);
+				const payload = _.omit(user.dataValues, [ 'createdAt', 'updatedAt', 'uid', 'mobile_number', 'verified']);
+				// logger.log(config.auth.jwt_secret, 'warn')
+				const token = jwt.sign({ payload }, config.auth.jwt_secret, { expiresIn: config.auth.jwt_expiresin, algorithm: 'HS512' });
+				const refreshToken = jwt.sign({
+					payload,
+				}, config.auth.refresh_token_secret, {
+					expiresIn: config.auth.refresh_token_expiresin,
+				});
+				const response = {
+					status: 'Registered',
+					token,
+					refreshToken,
+				};
+				tokenList[refreshToken] = response;
+				requestHandler.sendSuccess(res, 'Register Successfully')({ token, refreshToken });
 			} else {
 				requestHandler.throwError(422, 'Unprocessable Entity', 'unable to process the contained instructions')();
 			}
@@ -186,6 +210,26 @@ class AuthController extends BaseController {
 				requestHandler.throwError(400, 'bad request', 'no refresh token present in refresh token list')();
 			}
 		} catch (err) {
+			requestHandler.sendError(req, res, err);
+		}
+	}
+
+	static async c2VuZE9UUA(req, res) {
+		try {
+			const reqParam = req.params.val;
+			const schema = {
+				val: Joi.string().min(1),
+			};
+			const { error } = Joi.validate({ val: reqParam }, schema);
+			requestHandler.validateJoi(error, 400, 'bad Request', 'invalid');
+
+			var cleanedReqParam = reqParam.replace(/[^a-zA-Z0-9_-+=]/g, '');
+			var XXX = "JaA64s7FZP+ZG7dCUbj4OA=="
+			var cleanedReqParamXXX = XXX.replace(/[^a-zA-Z0-9_-+=]/g, '');
+			console.log(cleanedReqParamXXX);
+			decryptX(reqParam)
+
+		}catch (err){
 			requestHandler.sendError(req, res, err);
 		}
 	}

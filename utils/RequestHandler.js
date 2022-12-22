@@ -1,3 +1,4 @@
+const { retry } = require('async');
 const _ = require('lodash');
 
 class RequestHandler {
@@ -42,6 +43,12 @@ class RequestHandler {
 
 	sendError(req, res, error) {
 		this.logger.log(`error ,Error during processing request: ${`${req.protocol}://${req.get('host')}${req.originalUrl}`} details message: ${error.message}`, 'error');
+		if ( error.errorType === "sequelize error") {
+			console.log(error.errors);
+			return res.status(error.status || 500).json({
+				type: 'error', message: "sequlize error",
+			})
+		}
 		return res.status(error.status || 500).json({
 			type: 'error', message: error.message || error.message || 'Unhandled Error', error,
 		});
