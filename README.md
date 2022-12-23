@@ -1,6 +1,14 @@
- # NodeJS Project Structure
- 
-Recently I have started working on a new project and the issue that I faced was spending a lot of time building the project structure based on the best practices, especially with JavaScript/NodeJS that has a lot of approaches. I couldn't find any place that wraps the best practices into a single project, so I decided to make it on my own.
+#Add Remote Github
+- git init
+- git remote add origin https://github.com/syaddadSmiley/serverUbis_test1.git
+- git branch -M main
+- git pull origin main
+
+#Push Branch
+- git add .
+- git branch -M {nama branch}
+- git commit -m "feat: developing auth login & signUp"
+- git push origin {nama branch}
  
 In this repository, I don't aim to provide any optimal solution as each project have its own necessity but to help anyone that is starting with a NodeJS project and can't find any inspiration on how to start building the project to take this project as the starting point.
  
