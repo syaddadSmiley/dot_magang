@@ -78,12 +78,17 @@ class AuthController extends BaseController {
 
 			console.log("REQUEST", req.headers.authorization);
 			console.log(user.email, cleanedEmail);
-			await bcrypt
-				.compare(cleanedEmail, user.email)
-				.then(
-					requestHandler.throwIf(r => !r, 400, 'incorrect', 'failed to login bad credentials'),
-					requestHandler.throwError(500, 'bcrypt error'),
-				);
+			// await bcrypt
+			// 	.compare(cleanedEmail, user.email)
+			// 	.then(
+			// 		requestHandler.throwIf(r => !r, 400, 'incorrect', 'failed to login bad credentials'),
+			// 		requestHandler.throwError(500, 'bcrypt error'),
+			// 	);
+			if (cleanedEmail !== user.email) {
+				requestHandler.throwIf(r => !r, 400, 'incorrect', 'failed to login bad credentials');
+				requestHandler.throwError(500, 'bcrypt error');
+			}
+			
 			const data = {
 				last_login_date: new Date(),
 			};
@@ -117,9 +122,11 @@ class AuthController extends BaseController {
 				uid: Joi.string().required(),
 				email: Joi.string().email().required(),
 				name: Joi.string().required(),
+				mobile_number: Joi.number().required(),
 			};
-			logger.log("sampai0", 'warn')
-			const { error } = Joi.validate({ uid: data.uid, email: data.email, name: data.name }, schema);
+			logger.log("sampai0", 'warn');
+			console.log("ENTAH DIMANAAA");
+			const { error } = Joi.validate({ uid: data.uid, email: data.email, name: data.name , mobile_number: data.mobile_number}, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', error ? error.details[0].message : '');
 			const options = { where: { uid: data.uid } };
 			const user = await super.getByCustomOptions(req, 'users', options);
@@ -127,6 +134,19 @@ class AuthController extends BaseController {
 			if (user) {
 				requestHandler.throwError(400, 'bad request', 'invalid, account already existed')();
 			}
+
+			const cleanedUid = data.uid.replace(/[^a-zA-Z0-9_-]/g, '');
+			const cleanedEmail = data.email.replace(/[^a-zA-Z0-9_@.-]/g, '');
+			const cleanedName = data.name.replace(/[^a-zA-Z]/g, '');
+			const cleanedMobileNumber = data.mobile_number.replace(/[^0-9]/g, '');
+
+			const payload = {
+				uid: cleanedUid,
+				email: cleanedEmail,
+				name: cleanedName,
+				mobile_number: cleanedMobileNumber,
+			}
+			console.log(payload);
 
 			logger.log("sampai1", 'warn')
 
@@ -151,10 +171,10 @@ class AuthController extends BaseController {
 
 			logger.log("sampai2", 'warn')
 
-			const hashedEmail = bcrypt.hashSync(data.email, config.auth.saltRounds);
-			data.email = hashedEmail;
-			console.log(data.email);
-			const createdUser = await super.create(req, 'users');
+			// const hashedEmail = bcrypt.hashSync(data.email, config.auth.saltRounds);
+			// data.email = hashedEmail;
+			// console.log(data.email);
+			const createdUser = await super.create(req, 'users', payload);
 			if (!(_.isNull(createdUser))) {
 				const options = {
 					where: { uid: data.uid },

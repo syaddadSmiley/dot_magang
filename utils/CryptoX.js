@@ -5,12 +5,15 @@ const algorithm = 'aes-256-cbc';
 const key = config.auth.aes_secret;
 const iv = config.auth.aes_iv;
 
+
 class CryptoX {
+
+	
 	static async encryptX(text) {
 		let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
 		let encrypted = cipher.update(text);
 		encrypted = Buffer.concat([encrypted, cipher.final()]);
-		return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+		return { iv: iv.toString('hex'), encryptedData: encrypted.toString('utf-8') };
 	}
 
 	static async decryptX(text) {

@@ -68,7 +68,7 @@ router.get('/:id', auth.isAuthunticated, UsersController.getUserById);
  *         schema:
  *           $ref: '#/definitions/users'
  */
-router.delete('/:id([0-9])', UsersController.deleteById);
+router.delete('/:id', UsersController.deleteById);
 
 /**
  * @swagger
