@@ -243,9 +243,9 @@ class AuthController extends BaseController {
 			const { error } = Joi.validate({ val: reqParam }, schema);
 			requestHandler.validateJoi(error, 400, 'bad Request', 'invalid');
 
-			var cleanedReqParam = reqParam.replace(/[^a-zA-Z0-9_-+=]/g, '');
+			// var cleanedReqParam = reqParam.replace(/[^a-zA-Z0-9_-+=]/g, '');
 			var XXX = "JaA64s7FZP+ZG7dCUbj4OA=="
-			var cleanedReqParamXXX = XXX.replace(/[^a-zA-Z0-9_-+=]/g, '');
+			// var cleanedReqParamXXX = XXX.replace(/[^a-zA-Z0-9_-+=]/g, '');
 			console.log(cleanedReqParamXXX);
 			decryptX(reqParam)
 

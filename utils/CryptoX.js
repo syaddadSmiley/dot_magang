@@ -13,7 +13,7 @@ class CryptoX {
 		let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
 		let encrypted = cipher.update(text);
 		encrypted = Buffer.concat([encrypted, cipher.final()]);
-		return { iv: iv.toString('hex'), encryptedData: encrypted.toString('utf-8') };
+		return { iv: iv.toString('hex'), encryptedData: encrypted.toString('base64') };
 	}
 
 	static async decryptX(text) {

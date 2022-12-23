@@ -8,6 +8,6 @@ router.use('/email', require('./sendEmail'));
 
 router.use('/', require('./authRouter'));
 
-// router.use('/workspace', require('/.workspaceRouter'));
+router.use('/ws', require('./workspaceRouter'));
 
 module.exports = router;

@@ -8,3 +8,10 @@ const RequestHandler = require('../utils/RequestHandler');
 const Logger = require('../utils/logger');
 const BaseController = require('../controllers/BaseController');
 
+class WorkspaceController extends BaseController {
+    static async getAllWorkingspaces(req, res){
+        res.send('ok');
+    }
+}
+
+module.exports = WorkspaceController;
