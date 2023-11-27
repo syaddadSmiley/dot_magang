@@ -20,7 +20,7 @@ This project is a simple REST API built with Node.js and Express, following the 
 - `models`: Defines the data schema using Sequelize.
 - `routes`: Defines the API routes for items and authentication.
 - `tests`: Includes end-to-end tests for token authentication.
-- `middleware`: Contains JWT authentication middleware.
+- `utils`: Contais the authentication middleware, request handler, and logger.
 
 ## Why MVC Pattern?
 The MVC pattern was chosen for its simplicity and organization. It separates concerns by organizing the codebase into models, views, and controllers. This makes the codebase more maintainable and scalable, especially for small to medium-sized projects.
