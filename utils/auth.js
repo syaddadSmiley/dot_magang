@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
-const config = require('../config/appconfig');
 const RequestHandler = require('../utils/RequestHandler');
 const Logger = require('../utils/logger');
 
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
+
 function getTokenFromHeader(req) {
 	if ((req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token')
 		|| (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')) {
@@ -32,10 +32,9 @@ function verifyToken(req, res, next) {
 			requestHandler.throwError(401, 'Unauthorized', 'Not Authorized to access this resource!')();
 		}
 
-		// verifies secret and checks exp
-		jwt.verify(token, config.auth.jwt_secret, (err, decoded) => {
+		jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
 			if (err) {
-				requestHandler.throwError(401, 'Unauthorized', 'please provide a vaid token ,your token might be expired')();
+				requestHandler.throwError(401, 'Unauthorized', 'Please provide a valid token, your token might be expired')();
 			}
 			req.decoded = decoded;
 			next();
@@ -46,4 +45,18 @@ function verifyToken(req, res, next) {
 }
 
 
-module.exports = { getJwtToken: getTokenFromHeader, isAuthunticated: verifyToken };
+function getSomeFromToken(req, options) {
+	try {
+		var token = getTokenFromHeader(req);
+		if(!token){
+			token = req.query.token
+		}
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		return _.pick(decoded, options);
+	} catch (err) {
+		return null;
+	}
+}
+
+
+module.exports = { getJwtToken: getTokenFromHeader, isAuthenticated: verifyToken, getSomeFromToken };

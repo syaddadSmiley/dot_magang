@@ -2,9 +2,8 @@
 const { createLogger, format, transports } = require('winston');
 const fs = require('fs');
 const DailyRotate = require('winston-daily-rotate-file');
-const config = require('../config/appconfig');
 
-const { env } = config.app;
+const { env } = 'development'
 const logDir = 'log';
 
 let infoLogger;
@@ -125,6 +124,7 @@ class Logger {
 	}
 
 	log(message, severity, data) {
+		return
 		if (severity == null || infoLogger.levels[severity] == null) {
 			this.severity = 'info';
 		}

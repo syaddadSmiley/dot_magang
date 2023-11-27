@@ -1,6 +1,5 @@
 node_modules
 .env
 log
-contekan
 package-lock.json
 .git

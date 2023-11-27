@@ -2,46 +2,27 @@
 
 module.exports = (sequelize, DataTypes) => {
 	const Users = sequelize.define('users', {
-		uid: {
-			type: DataTypes.STRING,
-			allowNull: false,
+		id : {
+			type: DataTypes.INTEGER,
 			primaryKey: true,
+			autoIncrement: true,
 		},
-		email: {
-			type: DataTypes.STRING,
-			allowNull: false,
-		},
-		name: {
-			type: DataTypes.STRING,
-			allowNull: false,
-		},
-		verified: {
-			type: DataTypes.BOOLEAN,
-			allowNull: true,
-		},
-		mobile_number: {
+		username: {
 			type: DataTypes.STRING,
 		},
-		user_img: {
-			type: DataTypes.STRING,
-			allowNull: true,
-		},
-		createdAt:
-		{
-			type: DataTypes.DATE, field: 'created_at',
-		},
-		updatedAt: {
-			type: DataTypes.DATE, field: 'updated_at',
-		},
-		deleted_status: {
+		password: {
 			type: DataTypes.STRING,
 		},
-
-	}, {});
-	Users.associate = function (models) {
-		Users.hasMany(models.Roles, {
-			foreignKey: 'role_id',
-		});
-	};
+		created_at: {
+			type: DataTypes.DATE,
+			defaultValue: DataTypes.NOW,
+		},
+		updated_at: {
+			type: DataTypes.DATE,
+			defaultValue: DataTypes.NOW,
+		},
+	}, {
+		timestamps: false,
+	});
 	return Users;
-};
+}
