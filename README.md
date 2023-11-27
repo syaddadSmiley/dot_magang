@@ -19,7 +19,7 @@ This project is a simple REST API built with Node.js and Express, following the 
 - `controllers`: Contains the business logic for handling CRUD operations.
 - `models`: Defines the data schema using Sequelize.
 - `routes`: Defines the API routes for items and authentication.
-- `tests`: Includes end-to-end tests for token authentication.
+- `test`: Includes end-to-end tests for token authentication.
 - `middleware`: Contains JWT authentication middleware.
 
 ## Why MVC Pattern?
