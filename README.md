@@ -1,6 +1,6 @@
 #Add Remote Github
 - git init
-- git remote add origin https://github.com/syaddadSmiley/serverUbis_test1.git
+- git remote add origin https://github.com/syaddadSmiley/dot_magang.git
 - git branch -M main
 - git pull origin main
 
